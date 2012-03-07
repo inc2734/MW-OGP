@@ -120,7 +120,7 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 				<meta property="og:url" content="%s" />
 				<meta property="og:description" content="%s" />
 				<meta property="og:locale" content="%s" />
-			', $this->app_id, $options['type'], $options['site_name'], $options['image'], $options['title'], $options['url'], $options['description'], $options['locale'] );
+			', esc_attr( $this->app_id ), esc_attr( $options['type'] ), esc_attr( $options['site_name'] ), esc_attr( $options['image'] ) ,esc_attr( $options['title'] ), esc_attr( $options['url'] ), esc_attr( $options['description'] ), esc_attr( $options['locale'] ) );
 		}
 
 		/**

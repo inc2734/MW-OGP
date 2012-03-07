@@ -85,7 +85,7 @@ $types = array(
 			<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( 'mw_ogp-updatesettings' ); ?>
 			<tr>
 				<th scope="row" valign="top" style="width:20%"><label for="app_id">fb:app_id</label></th>
-				<td><input type="text" name="app_id" id="app_id" class="regular-text" value="<?php echo $options['app_id']; ?>"/></td>
+				<td><input type="text" name="app_id" id="app_id" class="regular-text" value="<?php echo esc_html( $options['app_id'] ); ?>"/></td>
 			</tr>
 			<tr>
 				<th scope="row" valign="top"><label for="type">fb:type( Front Page )<br />Defaut : blog</label></th>
@@ -104,7 +104,7 @@ $types = array(
 			</tr>
 			<tr>
 				<th scope="row" valign="top"><label for="image">fb:image</label></th>
-				<td><input type="text" name="image" id="image" class="regular-text" value="<?php echo $options['image']; ?>"/></td>
+				<td><input type="text" name="image" id="image" class="regular-text" value="<?php echo esc_html( $options['image'] ); ?>"/></td>
 			</tr>
 		</table>
 		<br/>
