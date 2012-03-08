@@ -3,7 +3,7 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: Added FB Scripts, div#fb-root, OGP tags.
- * Version: 0.1
+ * Version: 0.1.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * License: GPL2
@@ -50,7 +50,8 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 			add_option( 'mw_ogp', array(
 				'app_id' => '',
 				'type' => 'blog',
-				'image' => ''
+				'image' => '',
+				'locale' => 'ja_JP'
 			) );
 		}
 
@@ -87,7 +88,6 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 		 * Added tags in head
 		 */
 		public function print_head() {
-			$image = $this->options['image'];
 			if ( is_singular() && !is_front_page() ) {
 				$type = 'article';
 				$url = get_permalink();
@@ -105,10 +105,10 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 				'type' => $type,
 				'url' => $url,
 				'title' => $title,
-				'image' => $image,
+				'image' => $this->options['image'],
 				'site_name' => get_bloginfo( 'name' ),
 				'description' => $this->get_description(),
-				'locale' => 'ja_JP'
+				'locale' => $this->options['locale']
 			);
 	
 			echo sprintf( '
@@ -142,12 +142,12 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 				};
 				(function() {
 					var e = document.createElement("script");
-					e.src = document.location.protocol + "//connect.facebook.net/ja_JP/all.js";
+					e.src = document.location.protocol + "//connect.facebook.net/%s/all.js";
 					e.async = true;
 					document.getElementById("fb-root").appendChild(e);
 				}());
 				</script>
-			', $this->app_id, get_permalink() );
+			', esc_html( $this->app_id ), get_permalink(), esc_html( $this->options['locale'] ) );
 		}
 
 		/**
