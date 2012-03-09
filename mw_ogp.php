@@ -3,7 +3,7 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: Added FB Scripts, div#fb-root, OGP tags.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * License: GPL2
@@ -88,6 +88,7 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 		 * Added tags in head
 		 */
 		public function print_head() {
+			$image = $this->options['image'];
 			if ( is_singular() && !is_front_page() ) {
 				$type = 'article';
 				$url = get_permalink();
@@ -105,7 +106,7 @@ if ( ! class_exists( 'mw_ogp' ) ) {
 				'type' => $type,
 				'url' => $url,
 				'title' => $title,
-				'image' => $this->options['image'],
+				'image' => $image,
 				'site_name' => get_bloginfo( 'name' ),
 				'description' => $this->get_description(),
 				'locale' => $this->options['locale']
