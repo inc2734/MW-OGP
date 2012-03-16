@@ -3,7 +3,7 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: Added FB Scripts, div#fb-root, OGP tags.
- * Version: 0.2
+ * Version: 0.3
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * License: GPL2
@@ -115,6 +115,7 @@ class mw_ogp {
 		}
 
 		$options = array(
+			'app_id' => $this->options['app_id'],
 			'type' => $type,
 			'url' => $url,
 			'title' => $title,
@@ -159,7 +160,7 @@ class mw_ogp {
 				document.getElementById("fb-root").appendChild(e);
 			}());
 			</script>
-		', esc_html( $options['app_id'] ), esc_html( $this->options['locale'] ) );
+		', esc_html( $this->options['app_id'] ), esc_html( $this->options['locale'] ) );
 	}
 
 	/**
