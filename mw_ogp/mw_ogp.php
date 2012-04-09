@@ -172,7 +172,7 @@ class mw_ogp {
 	
 		$image_id = get_post_thumbnail_id();
 		if ( $image_id ) {
-			$image_url = wp_get_attachment_image_src( $image_id, 'thumbnail', true );
+			$image_url = wp_get_attachment_image_src( $image_id, 'medium', true );
 		}
 		
 		if ( !empty( $image_url[0] ) ) {
