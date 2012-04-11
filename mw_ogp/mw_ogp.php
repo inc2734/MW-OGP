@@ -177,7 +177,7 @@ class mw_ogp {
 		$description = strip_tags( $description );
 		$description = esc_html( $description );
 		$description = str_replace( array( "\r\n","\r","\n" ), '', $description );
-		$description = mb_strimwidth( $description, 0, $strnum, "窶ｦ", 'utf8' );
+		$description = mb_strimwidth( $description, 0, $strnum, "…", 'utf8' );
 		return $description;
 	}
 }
