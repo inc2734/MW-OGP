@@ -181,6 +181,36 @@ class mw_ogp_admin_page {
 		<li><a href="http://developers.facebook.com/tools/debug" target="_blank">Debugger - Facebook Developers</a></li>
 		<li><a href="http://2inc.org/" target="_blank">モンキーレンチ</a></li>
 	</ul>
+
+	<ol>
+		<li>&lt;head&gt;タグの属性として下記を追加してください。
+			<pre><code>xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml"</code></pre>
+		</li>
+		<li>
+			&lt;head&gt;タグの直後に下記を追加してください。
+			<pre><code>&lt;div id="fb-root"&gt;&lt;/div&gt;
+&lt;script&gt;
+window.fbAsyncInit = function() {
+	FB.init({
+		appId	: 'あなたの App ID', // App ID
+		status	: true, // check login status
+		cookie	: true, // enable cookies to allow the server to access the session
+		xfbml	: true  // parse XFBML
+	});
+};
+(function(d){
+	var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+	if (d.getElementById(id)) {return;}
+	js = d.createElement('script'); js.id = id; js.async = true;
+	js.src = "//connect.facebook.net/あなたのlocale/all.js";
+	ref.parentNode.insertBefore(js, ref);
+}(document));
+&lt;/script&gt;
+</code></pre>
+		</li>
+		<li>下記のフォームを入力してください。</li>
+	</ol>
+
 	<form action="" method="post" id="mw_ogp-config">
 		<table class="form-table">
 			<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( 'mw_ogp-updatesettings', 'mw_ogp-updatesettings' ); ?>
@@ -204,7 +234,10 @@ class mw_ogp_admin_page {
 			</tr>
 			<tr>
 				<th scope="row" valign="top"><label for="image">og:image</label></th>
-				<td><input type="text" name="image" id="image" class="regular-text" value="<?php echo esc_html( $options['image'] ); ?>"/></td>
+				<td>
+					<?php echo home_url(); ?>
+					<input type="text" name="image" id="image" class="regular-text" value="<?php echo esc_html( $options['image'] ); ?>"/>
+				</td>
 			</tr>
 			<tr>
 				<th scope="row" valign="top"><label for="locale">og:locale<br />Defaut : Japanese</label></th>
