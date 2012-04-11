@@ -2,8 +2,8 @@
 /** 
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
- * Description: Added FB Scripts, div#fb-root, OGP tags.
- * Version: 0.3
+ * Description: Added OGP tags.
+ * Version: 0.4
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * License: GPL2
@@ -78,7 +78,6 @@ class mw_ogp {
 	 */
 	public function add_filter() {
 		add_filter( 'wp_head', array( $this, 'print_head' ) );
-		add_filter( 'wp_footer', array( $this, 'print_footer' ) );
 	}
 
 	/**
@@ -100,7 +99,7 @@ class mw_ogp {
 	 * Added tags in head
 	 */
 	public function print_head() {
-		$image = $this->options['image'];
+		$image = home_url().$this->options['image'];
 		if ( is_singular() && !is_front_page() ) {
 			$type = 'article';
 			$url = get_permalink();
@@ -138,32 +137,6 @@ class mw_ogp {
 	}
 
 	/**
-	 * Added tags in footer
-	 */
-	public function print_footer() {
-		echo sprintf( '
-			<div id="fb-root"></div>
-			<script type="text/javascript">
-			window.fbAsyncInit = function() {
-				FB.init({
-					appId  : "%s",
-					status : true,
-					cookie : true,
-					xfbml  : true,
-					oauth  : true
-				});
-			};
-			(function() {
-				var e = document.createElement("script");
-				e.src = document.location.protocol + "//connect.facebook.net/%s/all.js";
-				e.async = true;
-				document.getElementById("fb-root").appendChild(e);
-			}());
-			</script>
-		', esc_html( $this->options['app_id'] ), esc_html( $this->options['locale'] ) );
-	}
-
-	/**
 	 * catch_that_image 
 	 */
 	public function catch_that_image() {
@@ -172,7 +145,7 @@ class mw_ogp {
 	
 		$image_id = get_post_thumbnail_id();
 		if ( $image_id ) {
-			$image_url = wp_get_attachment_image_src( $image_id, 'medium', true );
+			$image_url = wp_get_attachment_image_src( $image_id, 'midium', true );
 		}
 		
 		if ( !empty( $image_url[0] ) ) {
@@ -204,7 +177,7 @@ class mw_ogp {
 		$description = strip_tags( $description );
 		$description = esc_html( $description );
 		$description = str_replace( array( "\r\n","\r","\n" ), '', $description );
-		$description = mb_strimwidth( $description, 0, $strnum, "…", 'utf8' );
+		$description = mb_strimwidth( $description, 0, $strnum, "窶ｦ", 'utf8' );
 		return $description;
 	}
 }
