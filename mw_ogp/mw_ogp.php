@@ -3,7 +3,7 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: Added OGP tags.
- * Version: 0.4
+ * Version: 0.4.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * License: GPL2
