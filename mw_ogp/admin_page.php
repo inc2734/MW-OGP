@@ -183,11 +183,11 @@ class mw_ogp_admin_page {
 	</ul>
 
 	<ol>
-		<li>&lt;head&gt;タグの属性として下記を追加してください。
+		<li>&lt;html&gt;タグの属性として下記を追加してください。
 			<pre><code>xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml"</code></pre>
 		</li>
 		<li>
-			&lt;head&gt;タグの直後に下記を追加してください。
+			&lt;body&gt;タグの直後に下記を追加してください。
 			<pre><code>&lt;div id="fb-root"&gt;&lt;/div&gt;
 &lt;script&gt;
 window.fbAsyncInit = function() {
