@@ -189,7 +189,7 @@ class mw_ogp_admin_page {
 		<li>
 			&lt;body&gt;タグの直後に下記を追加してください。
 			<pre><code>&lt;div id="fb-root"&gt;&lt;/div&gt;
-&lt;script&gt;
+&lt;script type="text/javascript"&gt;
 window.fbAsyncInit = function() {
 	FB.init({
 		appId	: 'あなたの App ID', // App ID

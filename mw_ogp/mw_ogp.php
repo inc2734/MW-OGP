@@ -2,10 +2,11 @@
 /** 
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
- * Description: Added OGP tags.
- * Version: 0.4.1
+ * Description: The plugin add OGP tags.
+ * Version: 0.4.3
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
+ * Modified: Apr 24, 2012
  * License: GPL2
  *
  * Copyright 2012 Takashi Kitajima (email : inc@2inc.org)
@@ -84,7 +85,7 @@ class mw_ogp {
 	 * add_admin_menu
 	 */
 	public function add_admin_menu() {
-		add_options_page( 'MW OGP', 'MW OGP', 8, __FILE__,  array( $this, 'admin_page' ) );
+		add_options_page( 'MW OGP', 'MW OGP', 'activate_plugins', __FILE__,  array( $this, 'admin_page' ) );
 	}
 
 	/**
@@ -142,17 +143,20 @@ class mw_ogp {
 	public function catch_that_image() {
 		global $post;
 		$first_img = '';
-	
-		$image_id = get_post_thumbnail_id();
-		if ( $image_id ) {
-			$image_url = wp_get_attachment_image_src( $image_id, 'midium', true );
+		if ( function_exists( 'get_post_thumbnail_id' ) ) {
+			$image_id = get_post_thumbnail_id();
+			if ( !empty( $image_id ) ) {
+				$image_url = wp_get_attachment_image_src( $image_id, 'midium', true );
+			}
 		}
 		
 		if ( !empty( $image_url[0] ) ) {
 			$first_img = $image_url[0];
 		} else {
 			$output = preg_match_all( '/<img.+src=[\'"]([^\'"]+)[\'"].*>/msi', $post->post_content, $matches );
-			$first_img = $matches[1][0];
+			if ( !empty( $matches[1][0] ) ) {
+				$first_img = $matches[1][0];
+			}
 		}
 		if ( ! empty( $first_img ) && preg_match( '/^\/.+$/', $first_img ) ) {
 			$first_img = home_url().$first_img;
