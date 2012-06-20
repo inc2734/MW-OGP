@@ -3,10 +3,10 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: The plugin add OGP tags.
- * Version: 0.4.3
+ * Version: 0.5
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Modified: Apr 24, 2012
+ * Modified: Jun 13, 2012
  * License: GPL2
  *
  * Copyright 2012 Takashi Kitajima (email : inc@2inc.org)
@@ -24,19 +24,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-include( 'admin_page.php' );
-
-register_activation_hook( __FILE__, array( 'mw_ogp', 'activation' ) );
-register_uninstall_hook( __FILE__, array( 'mw_ogp', 'uninstall' ) );
-
-$mw_ogp = new mw_ogp();
-$mw_ogp->add_action();
-$mw_ogp->add_filter();
-
 class mw_ogp {
 
-	public static $options = array(
+	const NAME = 'mw_ogp';
+	protected static $options = array(
 		'app_id' => '',
 		'type' => 'blog',
 		'image' => '',
@@ -47,7 +38,14 @@ class mw_ogp {
 	 * Constructor
 	 */
 	public function __construct() {
-		$options = get_option( 'mw_ogp' );
+		register_activation_hook( __FILE__, array( self::NAME, 'activation' ) );
+		register_uninstall_hook( __FILE__, array( self::NAME, 'uninstall' ) );
+		include_once( plugin_dir_path( __FILE__ ) . 'system/admin.php' );
+		$this->admin_page = new mw_ogp_admin_page();
+		$this->admin_page->setName( self::NAME );
+		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+		add_filter( 'wp_head', array( $this, 'print_head' ) );
+		$options = get_option( self::NAME );
 		if ( !empty( $options ) ) {
 			$this->options = $options;
 		}
@@ -57,28 +55,16 @@ class mw_ogp {
 	 * activation
 	 */
 	public static function activation() {
-		add_option( 'mw_ogp', self::$options );
+		$options = get_option( self::NAME );
+		$options = array_merge( self::$options, (array)$options );
+		update_option( self::NAME, $options );
 	}
 
 	/**
 	 * uninstall
 	 */
 	public static function uninstall() {
-		delete_option( 'mw_ogp' );
-	}
-
-	/**
-	 * do action!
-	 */
-	public function add_action() {
-		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-	}
-
-	/**
-	 * do filter!
-	 */
-	public function add_filter() {
-		add_filter( 'wp_head', array( $this, 'print_head' ) );
+		delete_option( self::NAME );
 	}
 
 	/**
@@ -92,8 +78,7 @@ class mw_ogp {
 	 * admin_page
 	 */
 	public function admin_page() {
-		$admin_page = new mw_ogp_admin_page();
-		$admin_page->view();
+		$this->admin_page->view();
 	}
 
 	/**
@@ -134,7 +119,7 @@ class mw_ogp {
 			<meta property="og:url" content="%s" />
 			<meta property="og:description" content="%s" />
 			<meta property="og:locale" content="%s" />
-		', esc_attr( $options['app_id'] ), esc_attr( $options['type'] ), esc_attr( $options['site_name'] ), esc_attr( $options['image'] ) ,esc_attr( $options['title'] ), esc_attr( $options['url'] ), esc_attr( $options['description'] ), esc_attr( $options['locale'] ) );
+		', esc_attr( $options['app_id'] ), esc_attr( $options['type'] ), esc_attr( $options['site_name'] ), esc_attr( $options['image'] ) ,esc_attr( $options['title'] ), esc_attr( $options['url'] ), esc_attr( $options['description'] ), esc_attr( strtolower( $options['locale'] ) ) );
 	}
 
 	/**
@@ -169,6 +154,7 @@ class mw_ogp {
 	 */
 	public function get_description( $strnum = 200 ) {
 		global $post;
+		$description = '';
 		if ( is_singular() && !is_front_page() ) {
 			if ( !empty( $post->post_excerpt ) ) {
 				$description = $post->post_excerpt;
@@ -185,4 +171,4 @@ class mw_ogp {
 		return $description;
 	}
 }
-?>
+$mw_ogp = new mw_ogp();

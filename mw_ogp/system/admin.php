@@ -142,20 +142,22 @@ class mw_ogp_admin_page {
 	 * Constructor
 	 */
 	public function __construct() {
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
 	}
 
 	/**
-	 * do update_option
-	 *  @return	Boolean
+	 * setName
 	 */
-	private function _updateOption() {
-		$updateFlg = update_option( 'mw_ogp', array(
-			'app_id' => $_POST['app_id'],
-			'type' => $_POST['type'],
-			'image' => $_POST['image'],
-			'locale' => $_POST['locale'],
-		) );
-		return $updateFlg;
+	public function setName( $name ) {
+		$this->name = $name;
+	}
+
+	/**
+	 * register_settings
+	 */
+	public function register_settings() {
+		if ( empty( $this->name ) ) die( 'You can set $this->name.' );
+		register_setting( $this->name.'-options', $this->name );
 	}
 
 	/**
@@ -163,12 +165,9 @@ class mw_ogp_admin_page {
 	 */
 	public function view() {
 		if ( isset( $_POST['submit'] ) ) {
-			if ( ! current_user_can( 'manage_options' ) )
-				die( __( 'You cannot edit the search-by-category options.' ) );
-			check_admin_referer( 'mw_ogp-updatesettings', 'mw_ogp-updatesettings' );
-			$updateFlg = $this->_updateOption();
+			if ( ! current_user_can( 'manage_options' ) ) die( __( 'You cannot edit options.' ) );
+			$updateFlg = true;
 		}
-		$options = get_option( 'mw_ogp' );
 		?>
 <div class="wrap">
 	<?php screen_icon( 'edit-pages' ); ?>
@@ -184,7 +183,7 @@ class mw_ogp_admin_page {
 
 	<ol>
 		<li>&lt;html&gt;タグの属性として下記を追加してください。
-			<pre><code>xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml"</code></pre>
+			<pre><code>xmlns:og="http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#"</code></pre>
 		</li>
 		<li>
 			&lt;body&gt;タグの直後に下記を追加してください。
@@ -211,17 +210,18 @@ window.fbAsyncInit = function() {
 		<li>下記のフォームを入力してください。</li>
 	</ol>
 
-	<form action="" method="post" id="mw_ogp-config">
+	<form action="options.php" method="post">
+		<?php settings_fields( $this->name.'-options' ); ?>
+		<?php $options = get_option( $this->name ); ?>
 		<table class="form-table">
-			<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( 'mw_ogp-updatesettings', 'mw_ogp-updatesettings' ); ?>
 			<tr>
-				<th scope="row" valign="top" style="width:20%"><label for="app_id">fb:app_id</label></th>
-				<td><input type="text" name="app_id" id="app_id" class="regular-text" value="<?php echo esc_html( $options['app_id'] ); ?>"/></td>
+				<th scope="row" valign="top" style="width:20%">fb:app_id</th>
+				<td><input type="text" name="<?php echo $this->name; ?>[app_id]" class="regular-text" value="<?php echo esc_html( $options['app_id'] ); ?>"/></td>
 			</tr>
 			<tr>
-				<th scope="row" valign="top"><label for="type">og:type( Front Page )<br />Defaut : blog</label></th>
+				<th scope="row" valign="top">og:type( Front Page )<br />Defaut : blog</th>
 				<td>
-					<select name="type" id="type">
+					<select name="<?php echo $this->name; ?>[type]">
 						<?php foreach ( $this->types as $optgroupLbl => $optgroup ) : ?>
 						<optgroup label="<?php echo esc_html( $optgroupLbl ); ?>">
 							<?php foreach ( $optgroup as $type ) : ?>
@@ -233,16 +233,16 @@ window.fbAsyncInit = function() {
 				</td>
 			</tr>
 			<tr>
-				<th scope="row" valign="top"><label for="image">og:image</label></th>
+				<th scope="row" valign="top">og:image</th>
 				<td>
 					<?php echo home_url(); ?>
-					<input type="text" name="image" id="image" class="regular-text" value="<?php echo esc_html( $options['image'] ); ?>"/>
+					<input type="text" name="<?php echo $this->name; ?>[image]" class="regular-text" value="<?php echo esc_html( $options['image'] ); ?>"/>
 				</td>
 			</tr>
 			<tr>
-				<th scope="row" valign="top"><label for="locale">og:locale<br />Defaut : Japanese</label></th>
+				<th scope="row" valign="top">og:locale<br />Defaut : Japanese</th>
 				<td>
-					<select name="locale" id="locale">
+					<select name="<?php echo $this->name; ?>[locale]">
 						<?php foreach ( $this->locales as $localeLbl => $locale ) : ?>
 						<option value="<?php echo esc_html( $locale ); ?>"<?php selected( $options['locale'], $locale ); ?>><?php echo esc_html( $localeLbl ); ?></option>
 						<?php endforeach; ?>
