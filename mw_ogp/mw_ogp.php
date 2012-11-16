@@ -3,10 +3,11 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: The plugin add OGP tags.
- * Version: 0.5.1
+ * Version: 0.5.2
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Modified: August 11, 2012
+ * Created: March 19, 2012
+ * Modified: November 2, 2012
  * License: GPL2
  *
  * Copyright 2012 Takashi Kitajima (email : inc@2inc.org)
@@ -119,7 +120,16 @@ class mw_ogp {
 			<meta property="og:url" content="%s" />
 			<meta property="og:description" content="%s" />
 			<meta property="og:locale" content="%s" />
-		', esc_attr( $options['app_id'] ), esc_attr( $options['type'] ), esc_attr( $options['site_name'] ), esc_attr( $options['image'] ) ,esc_attr( $options['title'] ), esc_attr( $options['url'] ), esc_attr( $options['description'] ), esc_attr( strtolower( $options['locale'] ) ) );
+			',
+			esc_attr( apply_filters( 'mw_ogp_app_id', $options['app_id'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_type', $options['type'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_site_name', $options['site_name'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_image', $options['image'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_title', $options['title'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_url', $options['url'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_description', $options['description'] ) ),
+			esc_attr( apply_filters( 'mw_ogp_locale', strtolower( $options['locale'] ) ) )
+		);
 	}
 
 	/**
