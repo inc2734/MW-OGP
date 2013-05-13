@@ -1,26 +1,26 @@
 <?php
-/** 
+/**
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: The plugin add OGP tags.
- * Version: 0.5.3
+ * Version: 0.5.5
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Created: March 19, 2012
- * Modified: December 13, 2012
+ * Modified: April 18, 2013
  * License: GPL2
  *
- * Copyright 2012 Takashi Kitajima (email : inc@2inc.org)
- * 
+ * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
  * published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -90,15 +90,22 @@ class mw_ogp {
 		if ( is_singular() && !is_front_page() ) {
 			$type = 'article';
 			$url = get_permalink();
-			$title = get_the_title();
 			if ( $_image = $this->catch_that_image() ) {
 				$image = $_image;
 			}
 		} else {
 			$type = ( empty( $this->options['type'] ) ) ? 'blog' : $this->options['type'];
-			$url = home_url();
-			$title = get_bloginfo( 'name' );
+			//$url = home_url();
+			$url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+			if ( !empty( $_SERVER['QUERY_STRING'] ) ) {
+				$url = $url.'?'.$_SERVER['QUERY_STRING'];
+			}
+			$url = preg_replace( '/([^:])\/+/', '$1/', $url );
+			$url = trailingslashit( $url );
 		}
+		$title = trim( wp_title( '', false, '' ) );
+		if ( empty( $title ) )
+			$title = get_bloginfo( 'name' );
 
 		$options = array(
 			'app_id' => $this->options['app_id'],
@@ -133,7 +140,7 @@ class mw_ogp {
 	}
 
 	/**
-	 * catch_that_image 
+	 * catch_that_image
 	 */
 	public function catch_that_image() {
 		global $post;
@@ -144,12 +151,12 @@ class mw_ogp {
 				$image_url = wp_get_attachment_image_src( $image_id, 'midium', true );
 			}
 		}
-		
+
 		if ( !empty( $image_url[0] ) ) {
 			$first_img = $image_url[0];
 		} else {
 			if ( preg_match( '/<img.+?src=[\'"]([^\'"]+?)[\'"].*?>/msi', $post->post_content, $matches ) ) {
-				$first_img = $matches[1];
+				$first_img = do_shortcode( $matches[1] );
 			}
 		}
 		if ( ! empty( $first_img ) && preg_match( '/^\/.+$/', $first_img ) ) {
@@ -159,7 +166,7 @@ class mw_ogp {
 	}
 
 	/**
-	 * get_description 
+	 * get_description
 	 */
 	public function get_description( $strnum = 200 ) {
 		global $post;
@@ -171,11 +178,13 @@ class mw_ogp {
 				$description = $post->post_content;
 			}
 		}
-		$description = do_shortcode( $description );
+		// $description = do_shortcode( $description );
+		$description = strip_shortcodes( $description );
+		$description = str_replace( ']]>', ']]&gt;', $description );
 		$description = strip_tags( $description );
 		$description = esc_html( $description );
 		$description = str_replace( array( "\r\n","\r","\n" ), '', $description );
-		$description = mb_strimwidth( $description, 0, $strnum, "Åc", 'utf8' );
+		$description = mb_strimwidth( $description, 0, $strnum, "Å...", 'utf8' );
 		return $description;
 	}
 }
