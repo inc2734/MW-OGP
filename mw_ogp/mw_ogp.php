@@ -3,11 +3,11 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: The plugin add OGP tags.
- * Version: 0.5.5
+ * Version: 0.5.6
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Created: March 19, 2012
- * Modified: April 18, 2013
+ * Modified: August 29, 2013
  * License: GPL2
  *
  * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
@@ -28,7 +28,7 @@
 class mw_ogp {
 
 	const NAME = 'mw_ogp';
-	protected static $options = array(
+	protected $options = array(
 		'app_id' => '',
 		'type' => 'blog',
 		'image' => '',
