@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+/**
+ * ogp image
+ */
+#mwogp-images img {
+	height: auto;
+	max-width: 100%;
+}
+
+/**
+ * add, delete
+ */
+.mwogp-image-hide {
+	display: none;
+}
+.mwogp-image-show {
+	display: inline;
+}
+

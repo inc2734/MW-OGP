@@ -1,6 +1,8 @@
 <?php
 class mw_ogp_admin_page {
 
+	const DOMAIN = 'mw-ogp';
+
 	public $types = array(
 		'Activities' => array(
 			'activity',
@@ -57,7 +59,7 @@ class mw_ogp_admin_page {
 			'article'
 		)
 	);
-	
+
 	public $locales = array(
 		'Afrikaans' => 'af_ZA',
 		'Arabic' => 'ar_AR',
@@ -178,20 +180,19 @@ class mw_ogp_admin_page {
 	<ul>
 		<li><a href="https://developers.facebook.com/" target="_blank">facebook DEVELOPERS</a></li>
 		<li><a href="http://developers.facebook.com/tools/debug" target="_blank">Debugger - Facebook Developers</a></li>
-		<li><a href="http://2inc.org/" target="_blank">モンキーレンチ</a></li>
 	</ul>
 
 	<ol>
-		<li>&lt;html&gt;タグの属性として下記を追加してください。
+		<li><?php _e( 'Add this as an attribute of the &lt;html&gt;.', self::DOMAIN ); ?></li>
 			<pre><code>xmlns:og="http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#"</code></pre>
 		</li>
 		<li>
-			&lt;body&gt;タグの直後に下記を追加してください。
+			<?php _e( 'Add this immediately after the &lt;body&gt;', self::DOMAIN ); ?>
 			<pre><code>&lt;div id="fb-root"&gt;&lt;/div&gt;
 &lt;script type="text/javascript"&gt;
 window.fbAsyncInit = function() {
 	FB.init({
-		appId	: 'あなたの App ID', // App ID
+		appId	: 'Your App ID', // App ID
 		status	: true, // check login status
 		cookie	: true, // enable cookies to allow the server to access the session
 		xfbml	: true  // parse XFBML
@@ -207,7 +208,7 @@ window.fbAsyncInit = function() {
 &lt;/script&gt;
 </code></pre>
 		</li>
-		<li>下記のフォームを入力してください。</li>
+		<li><?php _e( 'Enter this form.', self::DOMAIN ); ?></li>
 	</ol>
 
 	<form action="options.php" method="post">
@@ -251,7 +252,7 @@ window.fbAsyncInit = function() {
 			</tr>
 		</table>
 		<br/>
-		<span class="submit" style="border: 0;"><input type="submit" name="submit" value="Save Settings" /></span>
+		<span class="submit" style="border: 0;"><input type="submit" name="submit" value="<?php _e( 'Save Settings', self::DOMAIN ); ?>" /></span>
 	</form>
 </div>
 		<?php
