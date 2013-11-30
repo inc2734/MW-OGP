@@ -3,11 +3,11 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: MW OGP added OGP tags.
- * Version: 0.5.9
+ * Version: 0.5.12
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Created : March 19, 2012
- * Modified: October 19, 2013
+ * Modified: November 19, 2013
  * Text Domain: mw-ogp
  * Domain Path: /languages/
  * License: GPL2
@@ -74,7 +74,7 @@ class mw_ogp {
 	 */
 	public function init() {
 		load_plugin_textdomain( self::DOMAIN, false, basename( dirname( __FILE__ ) ) . '/languages' );
-		add_filter( 'wp_head', array( $this, 'print_head' ) );
+		add_action( 'wp_head', array( $this, 'print_head' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_head', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_post' ) );
@@ -116,24 +116,49 @@ class mw_ogp {
 		$image = home_url() . $this->options['image'];
 		if ( is_singular() && !is_front_page() ) {
 			$type = 'article';
+			$title = get_the_title();
 			$url = get_permalink();
-			if ( $_image = $this->catch_that_image() ) {
+			if ( $_image = $this->catch_that_image() )
 				$image = $_image;
-			}
-		} else {
+		}
+		elseif ( is_tax() || is_category() || is_tag() ) {
+			$term_obj = get_queried_object();
+			$type = 'article';
+			$title = $term_obj->name;
+			$url = get_term_link( $term_obj, $term_obj->taxonomy );
+		}
+		elseif ( is_author() ) {
+			$author_obj = get_queried_object();
+			$title = $author_obj->display_name;
+			$type = 'author';
+			$url = get_author_posts_url( $author_obj->ID );
+		}
+		elseif ( is_post_type_archive() ) {
+			$post_type_obj = get_queried_object();
+			$title = $post_type_obj->labels->name;
+			$type = 'article';
+			$url = get_post_type_archive_link( $post_type_obj->name );
+		}
+		else {
+			$title = get_bloginfo( 'name' );
 			$type = ( empty( $this->options['type'] ) ) ? 'blog' : $this->options['type'];
-			if ( is_singular() ) {
-				$url = get_permalink();
-			} else {
-				$url  = 'http';
-				$url .= ( empty( $_SERVER['HTTPS'] ) ) ? '' : 's';
-				$url .= '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-				if ( !empty( $_SERVER['QUERY_STRING'] ) ) {
-					$url = $url . '?' . $_SERVER['QUERY_STRING'];
-				}
-			}
+			$url = home_url();
 		}
 		$title = trim( wp_title( '', false, '' ) );
+		$parse_url = parse_url( $url );
+		if ( count( $_GET ) ) {
+			$get = $_GET;
+			$query = array();
+			if ( isset( $parse_url['query'] ) ) {
+				parse_str( $parse_url['query'], $query );
+				foreach ( $get as $key => $value ) {
+					if ( array_key_exists( $key, $query ) ) {
+						unset( $get[$key] );
+					}
+				}
+			}
+			$url .= '?' . http_build_query( $get, null, '&' );
+		}
 
 		$options = array(
 			'app_id' => $this->options['app_id'],
@@ -161,7 +186,7 @@ class mw_ogp {
 			esc_attr( apply_filters( 'mw_ogp_site_name', $options['site_name'] ) ),
 			esc_attr( apply_filters( 'mw_ogp_image', $options['image'] ) ),
 			esc_attr( apply_filters( 'mw_ogp_title', $options['title'] ) ),
-			esc_attr( apply_filters( 'mw_ogp_url', $options['url'] ) ),
+			apply_filters( 'mw_ogp_url', $options['url'] ),
 			esc_attr( apply_filters( 'mw_ogp_description', $options['description'] ) ),
 			esc_attr( apply_filters( 'mw_ogp_locale', strtolower( $options['locale'] ) ) )
 		);
@@ -201,15 +226,17 @@ class mw_ogp {
 		global $post;
 		$description = get_bloginfo( 'description' );
 		if ( is_singular() ) {
-			add_filter( 'wp_trim_excerpt', array( $this, 'wp_trim_excerpt'), 9999 );
-			$description = get_the_excerpt();
-			remove_filter( 'wp_trim_excerpt', array( $this, 'wp_trim_excerpt' ), 9999 );
+			if ( !empty( $post->post_excerpt ) ) {
+				$description = $post->post_excerpt;
+			} elseif ( !empty( $post->post_content ) ) {
+				$description = $post->post_content;
+			}
+			$description = strip_shortcodes( $description );
+			$description = strip_tags( $description );
+			$description = str_replace( array( "\r\n","\r","\n" ), '', $description );
+			$description = mb_strimwidth( $description, 0, $strnum, "…", 'utf8' );
 		}
-		return $description;
-	}
-	public function wp_trim_excerpt( $excerpt ) {
-		global $post;
-		return $post->post_excerpt;
+		return strip_tags( $description );
 	}
 
 	/**
@@ -305,8 +332,8 @@ class mw_ogp {
 	public function save_post( $post_ID ) {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
 			return $post_ID;
-		//if ( !current_user_can( 'manage_options', $post_ID ) )
-			//return $post_ID;
+		if ( !current_user_can( 'manage_options' ) )
+			return $post_ID;
 		if ( !isset( $_POST[self::NAME] ) )
 			return $post_ID;
 
