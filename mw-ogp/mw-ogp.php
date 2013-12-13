@@ -3,11 +3,11 @@
  * Plugin Name: MW OGP
  * Plugin URI: http://2inc.org
  * Description: MW OGP added OGP tags.
- * Version: 0.5.12
+ * Version: 0.5.13
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Created : March 19, 2012
- * Modified: November 19, 2013
+ * Modified: December 4, 2013
  * Text Domain: mw-ogp
  * Domain Path: /languages/
  * License: GPL2
@@ -142,7 +142,11 @@ class mw_ogp {
 		else {
 			$title = get_bloginfo( 'name' );
 			$type = ( empty( $this->options['type'] ) ) ? 'blog' : $this->options['type'];
-			$url = home_url();
+			if ( is_singular() && is_front_page() ) {
+				$url = get_permalink();
+			} else {
+				$url = home_url();
+			}
 		}
 		$title = trim( wp_title( '', false, '' ) );
 		$parse_url = parse_url( $url );
@@ -225,18 +229,23 @@ class mw_ogp {
 	public function get_description( $strnum = 200 ) {
 		global $post;
 		$description = get_bloginfo( 'description' );
-		if ( is_singular() ) {
+		$site_description = $description;
+		if ( is_singular() && empty( $post->post_password ) ) {
 			if ( !empty( $post->post_excerpt ) ) {
 				$description = $post->post_excerpt;
 			} elseif ( !empty( $post->post_content ) ) {
 				$description = $post->post_content;
 			}
-			$description = strip_shortcodes( $description );
-			$description = strip_tags( $description );
-			$description = str_replace( array( "\r\n","\r","\n" ), '', $description );
-			$description = mb_strimwidth( $description, 0, $strnum, "…", 'utf8' );
 		}
-		return strip_tags( $description );
+		$description = strip_shortcodes( $description );
+		$description = str_replace( ']]>', ']]&gt;', $description );
+		$description = strip_tags( $description );
+		$description = str_replace( array( "\r\n","\r","\n" ), '', $description );
+		$description = mb_strimwidth( $description, 0, $strnum, "...", 'utf8' );
+		if ( empty( $description ) ) {
+			$description = $site_description;
+		}
+		return $description;
 	}
 
 	/**
